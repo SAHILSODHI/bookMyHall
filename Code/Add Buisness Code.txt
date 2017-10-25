@@ -1,0 +1,27 @@
+public
+function addBusiness(\Illuminate\ Http\ Request $request) {
+    $member = new Member;
+    $member - > first_name = $request - > first_name;
+    $member - > email = $request - > email;
+    $member - > contact = $request - > contact;
+    $member - > hash_key = str_random(60);
+    $member - > password = str_random(8);
+    $member - > save();
+
+    $hall = new Hall;
+    $hall - > name = $request - > hall_name;
+    $hall - > city = $request - > hall_city;
+    $hall - > street = $request - > hall_address;
+    $member - > halls() - > save($hall);
+
+    //	 Auth::user()->content()->save($content);
+
+    //	 $content->meme()->save($meme);
+
+    if (Mail::send('emails.welcome', ['member' => $member], function($m) use($member) {
+            $m - > to($member - > email, $member - > first_name) - > subject('Welcome');
+        }))
+        return "Mail Sent";
+    else
+        return "fail";
+}

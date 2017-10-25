@@ -1,0 +1,27 @@
+public
+function verify($id, \Illuminate\ Http\ Request $request) {
+    $user_status = "inactive";
+    $key = explode('-', $id);
+    $member = Member::find($key[0]);
+    if ($member - > hash_key == $key[1]) {
+        $member - > status = 1;
+        $member - > save();
+        $user_status = "active";
+    }
+    return view('emails.verify', compact('user_status'));
+
+}
+
+public
+function resend(\Illuminate\ Http\ Request $request) {
+
+    $member = Member::where('email', $request - > email) - > get();
+    $member[0] - > hash_key = str_random(60);
+    $member[0] - > save();
+    $user = $member[0];
+    Mail::send('emails.welcome', ['member' => $user], function($m) use($member) {
+        $m - > to($member[0] - > email, $member[0] - > first_name) - > subject('Welcome');
+    });
+    //return view('emails.verify', compact('user_status');
+
+}
